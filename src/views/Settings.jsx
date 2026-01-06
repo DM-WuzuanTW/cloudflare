@@ -108,11 +108,22 @@ export default function Settings() {
                                     </span>
                                 )}
                                 {updateStatus.type === 'error' && (
-                                    <div style={{ color: 'var(--status-error-text)', display: 'flex', alignItems: 'flex-start', gap: 6, maxWidth: '100%' }}>
-                                        <FaInfoCircle style={{ marginTop: 3, flexShrink: 0 }} />
-                                        <span style={{ fontSize: 12, wordBreak: 'break-word', lineHeight: 1.4, maxWidth: 300 }}>
-                                            {t('settings.status_error')} {updateStatus.msg.length > 100 ? updateStatus.msg.substring(0, 100) + '...' : updateStatus.msg}
-                                        </span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <div style={{ color: 'var(--status-error-text)', display: 'flex', alignItems: 'flex-start', gap: 6, maxWidth: '100%' }}>
+                                            <FaInfoCircle style={{ marginTop: 3, flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, wordBreak: 'break-word', lineHeight: 1.4, maxWidth: 300 }}>
+                                                {t('settings.status_error')} {updateStatus.msg.length > 100 ? updateStatus.msg.substring(0, 100) + '...' : updateStatus.msg}
+                                            </span>
+                                        </div>
+                                        <a
+                                            href="https://github.com/DM-WuzuanTW/cloudflare/releases"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="btn btn-primary"
+                                            style={{ fontSize: 13, height: 32, padding: '0 12px', width: 'fit-content' }}
+                                        >
+                                            <FaDownload style={{ marginRight: 6 }} /> Download Manually
+                                        </a>
                                     </div>
                                 )}
                             </div>

@@ -18,6 +18,16 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 // Setup Auto Updater Events
 function setupAutoUpdater() {
+    // Explicitly set feed to ensure it finds the repo
+    autoUpdater.setFeedURL({
+        provider: 'github',
+        owner: 'DM-WuzuanTW',
+        repo: 'cloudflare'
+    });
+
+    // Disable differential download to prevent some issues with unsigned apps
+    autoUpdater.downloadedFile = false;
+
     // Use checkForUpdates() instead of checkForUpdatesAndNotify() to suppress system notifications
     autoUpdater.checkForUpdates();
 
@@ -82,6 +92,7 @@ function createWindow() {
         width: 1280,
         height: 800,
         titleBarStyle: 'hiddenInset',
+        autoHideMenuBar: true, // Hide menu bar
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -90,6 +101,8 @@ function createWindow() {
         backgroundColor: '#111111',
         show: false
     });
+
+    mainWindow.setMenu(null); // Completely remove default menu
 
     const isDev = !app.isPackaged;
     if (isDev) {

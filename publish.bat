@@ -115,49 +115,62 @@ if %errorlevel% neq 0 (
 REM --- FORCE RELEASE CREATION & UPLOAD ---
 echo.
 echo [Step 4/4] Verifying GitHub Release...
+
+REM Check for GitHub CLI - try both PATH and common install location
+set "GH_COMMAND="
 where gh >nul 2>nul
 if %errorlevel% equ 0 (
+    set "GH_COMMAND=gh"
+) else if exist "C:\Program Files\GitHub CLI\gh.exe" (
+    set "GH_COMMAND=C:\Program Files\GitHub CLI\gh.exe"
+)
+
+if defined GH_COMMAND (
     REM Create release if not exists (idempotent-ish)
     echo    - Ensuring Release v%VERSION% exists...
-    call gh release create v%VERSION% --title "Release v%VERSION%" --notes "Auto-generated release v%VERSION%" --verify-tag >nul 2>&1
+    call "%GH_COMMAND%" release create v%VERSION% --title "Release v%VERSION%" --notes "Auto-generated release v%VERSION%" --verify-tag >nul 2>&1
     
     REM Upload assets manually - electron-builder sometimes fails to upload
     echo    - Uploading release assets...
     
     if exist "release\latest.yml" (
         echo      ^> Uploading latest.yml...
-        call gh release upload v%VERSION% "release\latest.yml" --clobber
+        call "%GH_COMMAND%" release upload v%VERSION% "release\latest.yml" --clobber
     ) else (
         echo      [ERROR] latest.yml not found!
     )
     
     if exist "release\Cloudflare Desktop Setup %VERSION%.exe" (
         echo      ^> Uploading installer exe...
-        call gh release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe" --clobber
+        call "%GH_COMMAND%" release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe" --clobber
     ) else (
         echo      [ERROR] Installer exe not found!
     )
     
     if exist "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" (
         echo      ^> Uploading blockmap...
-        call gh release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" --clobber
+        call "%GH_COMMAND%" release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" --clobber
     ) else (
         echo      [WARNING] Blockmap not found (delta updates disabled)
     )
     
     echo    - Upload complete!
-) else (
-    echo.
-    echo [ERROR] GitHub CLI (gh) is REQUIRED but not installed!
-    echo.
-    echo Please install GitHub CLI from: https://cli.github.com/
-    echo OR run: winget install GitHub.cli
-    echo.
-    echo After installation, run: gh auth login
-    echo.
-    pause
-    exit /b 1
+    goto :ReleaseSuccess
 )
+
+REM If we got here, GitHub CLI is not available
+echo.
+echo [ERROR] GitHub CLI (gh) is REQUIRED but not installed!
+echo.
+echo Please install GitHub CLI from: https://cli.github.com/
+echo OR run: winget install GitHub.cli
+echo.
+echo After installation, run: gh auth login
+echo.
+pause
+exit /b 1
+
+:ReleaseSuccess
 
 echo.
 echo ========================================================

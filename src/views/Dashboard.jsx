@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import {
+    FaChartPie, FaGlobe, FaNetworkWired, FaShieldAlt,
+    FaBolt, FaHammer, FaFileCode, FaCog, FaSignOutAlt
+} from 'react-icons/fa';
 import Zones from './Zones';
 import Workers from './Workers';
 import Pages from './Pages';
@@ -7,14 +11,14 @@ export default function Dashboard({ user, onLogout }) {
     const [activeTab, setActiveTab] = useState('zones');
 
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-        { id: 'zones', label: 'Zones', icon: '🌐' },
-        { id: 'dns', label: 'DNS', icon: '📡' },
-        { id: 'security', label: 'Security', icon: '🛡️' },
-        { id: 'cache', label: 'Cache', icon: '⚡' },
-        { id: 'workers', label: 'Workers', icon: '👷' },
-        { id: 'pages', label: 'Pages', icon: '📄' },
-        { id: 'settings', label: 'Settings', icon: '⚙️' },
+        { id: 'dashboard', label: 'Dashboard', icon: <FaChartPie /> },
+        { id: 'zones', label: 'Websites (Zones)', icon: <FaGlobe /> },
+        { id: 'dns', label: 'DNS', icon: <FaNetworkWired /> },
+        { id: 'security', label: 'Security', icon: <FaShieldAlt /> },
+        { id: 'cache', label: 'Caching', icon: <FaBolt /> },
+        { id: 'workers', label: 'Workers & KV', icon: <FaHammer /> },
+        { id: 'pages', label: 'Pages', icon: <FaFileCode /> },
+        { id: 'settings', label: 'Settings', icon: <FaCog /> },
     ];
 
     const renderContent = () => {
@@ -23,9 +27,17 @@ export default function Dashboard({ user, onLogout }) {
             case 'workers': return <Workers />;
             case 'pages': return <Pages />;
             default: return (
-                <div style={{ textAlign: 'center', marginTop: 100 }}>
-                    <h2 style={{ color: 'var(--text-secondary)' }}>Select a module to get started</h2>
-                    <p className="text-sec">Module "{activeTab}" is coming soon.</p>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '60vh',
+                    color: 'var(--text-secondary)'
+                }}>
+                    <FaCog style={{ fontSize: 48, marginBottom: 20, opacity: 0.2 }} />
+                    <h2 style={{ color: 'var(--text-primary)', marginBottom: 10 }}>Coming Soon</h2>
+                    <p>The {activeTab} module is under development.</p>
                 </div>
             );
         }
@@ -33,46 +45,46 @@ export default function Dashboard({ user, onLogout }) {
 
     return (
         <div className="app-container">
-            <div className="sidebar">
-                <div style={{ paddingBottom: 20, borderBottom: '1px solid var(--border)', marginBottom: 20 }}>
-                    <h3 style={{ margin: 0 }}>Cloudflare</h3>
-                    <p className="text-sec" style={{ fontSize: 12, margin: '5px 0 0 0' }}>{user}</p>
+            <div className="sidebar-area">
+                <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border-subtle)', marginBottom: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fff' }}>
+                        {/* Simple Logo Placeholder */}
+                        <div style={{ width: 28, height: 28, background: 'var(--cf-orange)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 16, color: '#fff' }}>
+                            <FaBolt />
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>Cloudflare</div>
+                    </div>
+                    <p style={{ margin: '8px 0 0 0', fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {user}
+                    </p>
                 </div>
 
-                <nav style={{ flex: 1 }}>
+                <nav style={{ flex: 1, overflowY: 'auto' }}>
                     {menuItems.map(item => (
                         <div
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
-                            style={{
-                                padding: '10px 12px',
-                                borderRadius: 6,
-                                marginBottom: 4,
-                                cursor: 'pointer',
-                                background: activeTab === item.id ? 'var(--accent)' : 'transparent',
-                                color: activeTab === item.id ? '#fff' : 'var(--text-secondary)',
-                                fontWeight: activeTab === item.id ? 600 : 400,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 10
-                            }}
+                            className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
                         >
-                            <span>{item.icon}</span>
+                            <span className="nav-icon">{item.icon}</span>
                             {item.label}
                         </div>
                     ))}
                 </nav>
 
-                <button
-                    onClick={onLogout}
-                    className="btn"
-                    style={{ width: '100%', background: 'rgba(255,255,255,0.05)', color: '#ff6b6b' }}
-                >
-                    Sign Out
-                </button>
+                <div style={{ padding: 20, borderTop: '1px solid var(--border-subtle)' }}>
+                    <button
+                        onClick={onLogout}
+                        className="btn btn-ghost"
+                        style={{ width: '100%', justifyContent: 'flex-start', color: '#ff6b6b' }}
+                    >
+                        <FaSignOutAlt style={{ marginRight: 12 }} />
+                        Log Out
+                    </button>
+                </div>
             </div>
 
-            <div className="main-content">
+            <div className="content-area">
                 {renderContent()}
             </div>
         </div>

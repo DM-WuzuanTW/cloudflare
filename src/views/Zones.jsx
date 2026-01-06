@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FaSync, FaGlobe, FaCheckCircle, FaExclamationCircle, FaArrowRight } from 'react-icons/fa';
 
 export default function Zones() {
     const [zones, setZones] = useState([]);
@@ -19,28 +20,52 @@ export default function Zones() {
         });
     };
 
-    if (loading) return <div>Loading Zones...</div>;
+    if (loading) return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-secondary)' }}>
+            <FaSync className="spin" /> Loading Zones...
+        </div>
+    );
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <h2>Active Zones</h2>
-                <button className="btn btn-primary" onClick={loadZones}>Refresh</button>
+            <div className="page-header">
+                <div>
+                    <h2 className="page-title">Website Zones</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '5px 0 0 0' }}>
+                        Manage your domains and site configurations.
+                    </p>
+                </div>
+                <button className="btn btn-secondary" onClick={loadZones}>
+                    <FaSync /> Refresh
+                </button>
             </div>
+
             <div className="grid-cols-2">
                 {zones.map(zone => (
                     <div key={zone.id} className="card">
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <h3 style={{ marginBottom: 5, fontSize: '1.2em' }}>{zone.name}</h3>
-                            <span className={`status-badge ${zone.status === 'active' ? 'status-active' : 'status-pending'}`}>{zone.status}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <FaGlobe style={{ color: 'var(--text-muted)' }} />
+                                    <h3 style={{ fontSize: 18 }}>{zone.name}</h3>
+                                </div>
+                                <div style={{ marginTop: 8, fontSize: 13, color: 'var(--text-secondary)' }}>
+                                    Plan: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{zone.plan.name}</span>
+                                </div>
+                            </div>
+                            <span className={`badge ${zone.status === 'active' ? 'badge-success' : 'badge-warning'}`}>
+                                {zone.status === 'active' && <FaCheckCircle style={{ marginRight: 4, fontSize: 10 }} />}
+                                {zone.status !== 'active' && <FaExclamationCircle style={{ marginRight: 4, fontSize: 10 }} />}
+                                {zone.status.toUpperCase()}
+                            </span>
                         </div>
-                        <p className="text-sec" style={{ fontSize: '14px', margin: '5px 0 15px 0' }}>
-                            {zone.plan.name} Plan
-                        </p>
-                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', gap: 10 }}>
-                            <button className="btn" style={{ background: 'rgba(255,255,255,0.05)' }}>DNS</button>
-                            <button className="btn" style={{ background: 'rgba(255,255,255,0.05)' }}>Cache</button>
-                            <button className="btn" style={{ background: 'rgba(255,255,255,0.05)' }}>Settings</button>
+
+                        <div style={{ marginTop: 20, borderTop: '1px solid var(--border-subtle)', paddingTop: 16, display: 'flex', gap: 10 }}>
+                            <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}>DNS</button>
+                            <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}>Cache</button>
+                            <button className="btn btn-primary" style={{ width: 40 }}>
+                                <FaArrowRight />
+                            </button>
                         </div>
                     </div>
                 ))}

@@ -38,6 +38,14 @@ function setupAutoUpdater() {
     // Fix: Set User-Agent to avoid 406 Not Acceptable from GitHub protections
     autoUpdater.requestHeaders = { "User-Agent": "CloudflareDesktop/1.0.0" };
 
+    // SWITCH TO GENERIC PROVIDER FOR RELIABILITY
+    // The native GitHub provider can be flaky with API limits or 404s on fresh releases.
+    // Using 'generic' pointing to the '/latest/download/' URL is often more robust for public repos.
+    autoUpdater.setFeedURL({
+        provider: 'generic',
+        url: 'https://github.com/DM-WuzuanTW/cloudflare/releases/latest/download/'
+    });
+
     // Use checkForUpdates() instead of checkForUpdatesAndNotify() to suppress system notifications
     autoUpdater.checkForUpdates();
 

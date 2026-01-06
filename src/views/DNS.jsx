@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    FaNetworkWired, FaEdit, FaTrash, FaCloud, FaCloudShowersHeavy,
-    FaPlus, FaSearch, FaTimes, FaCheck, FaGlobeAmericas, FaShieldAlt
+    FaPlus, FaSearch, FaTimes, FaCheck, FaGlobeAmericas, FaShieldAlt,
+    FaChevronDown
 } from 'react-icons/fa';
 
 export default function DNS() {
@@ -12,6 +12,7 @@ export default function DNS() {
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isZoneDropdownOpen, setIsZoneDropdownOpen] = useState(false);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -135,16 +136,67 @@ export default function DNS() {
                     </p>
                 </div>
 
-                <div style={{ position: 'relative' }}>
-                    <FaGlobeAmericas style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                    <select
-                        className="input"
-                        style={{ paddingLeft: 36, minWidth: 250, borderColor: selectedZone ? 'var(--cf-orange)' : '' }}
-                        value={selectedZone}
-                        onChange={handleZoneChange}
+                <div style={{ position: 'relative', minWidth: 280, zIndex: 100 }}>
+                    <div
+                        onClick={() => setIsZoneDropdownOpen(!isZoneDropdownOpen)}
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            background: 'var(--bg-input)',
+                            border: `1px solid ${isZoneDropdownOpen ? 'var(--cf-orange)' : 'var(--border-subtle)'}`,
+                            padding: '10px 14px', borderRadius: 6, cursor: 'pointer', transition: 'all 0.2s',
+                            boxShadow: isZoneDropdownOpen ? '0 0 0 1px var(--cf-orange)' : 'none'
+                        }}
                     >
-                        {zones.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
-                    </select>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <FaGlobeAmericas style={{ color: selectedZone ? 'var(--cf-orange)' : 'var(--text-muted)' }} />
+                            <span style={{ fontWeight: 600, color: selectedZone ? 'var(--text-primary)' : 'var(--text-secondary)', fontSize: 14 }}>
+                                {zones.find(z => z.id === selectedZone)?.name || t('dns_mgmt.select_zone')}
+                            </span>
+                        </div>
+                        <FaChevronDown size={12} style={{ color: 'var(--text-secondary)', transform: isZoneDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                    </div>
+
+                    {isZoneDropdownOpen && (
+                        <>
+                            <div style={{ position: 'fixed', inset: 0, zIndex: 99, cursor: 'default' }} onClick={() => setIsZoneDropdownOpen(false)} />
+                            <div className="card" style={{
+                                position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 8,
+                                padding: 6, zIndex: 100, maxHeight: 300, overflowY: 'auto',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.5)', border: '1px solid var(--border-active)'
+                            }}>
+                                {zones.map(z => (
+                                    <div
+                                        key={z.id}
+                                        onClick={() => {
+                                            if (z.id !== selectedZone) {
+                                                setSelectedZone(z.id);
+                                                loadRecords(z.id);
+                                            }
+                                            setIsZoneDropdownOpen(false);
+                                        }}
+                                        style={{
+                                            padding: '10px 12px', borderRadius: 4, cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            background: z.id === selectedZone ? 'rgba(246, 130, 31, 0.1)' : 'transparent',
+                                            color: z.id === selectedZone ? 'var(--cf-orange)' : 'var(--text-primary)',
+                                            marginBottom: 2, transition: 'background 0.2s'
+                                        }}
+                                        className="zone-option"
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <div style={{
+                                                width: 8, height: 8, borderRadius: '50%',
+                                                background: z.status === 'active' ? 'var(--status-success-text)' : (z.status === 'pending' ? 'var(--status-warning-text)' : '#666'),
+                                                boxShadow: '0 0 5px rgba(0,0,0,0.2)'
+                                            }} />
+                                            <span style={{ fontWeight: 500, fontSize: 14 }}>{z.name}</span>
+                                        </div>
+                                        {z.id === selectedZone && <FaCheck size={12} />}
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -339,6 +391,7 @@ export default function DNS() {
                 .btn-icon:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
                 .btn-icon.danger:hover { background: rgba(248, 81, 73, 0.2); color: var(--status-error-text); }
                 .table-row-hover:hover { background: rgba(255,255,255,0.03) !important; }
+                .zone-option:hover { background: rgba(255,255,255,0.05) !important; }
             `}</style>
         </div>
     );

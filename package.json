@@ -1,6 +1,6 @@
 {
     "name": "cloudflare-desktop-panel",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "description": "Premium Desktop Control Panel for Cloudflare",
     "repository": {
         "type": "git",

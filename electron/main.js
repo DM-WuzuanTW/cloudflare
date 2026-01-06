@@ -36,14 +36,25 @@ function setupAutoUpdater() {
     autoUpdater.allowPrerelease = true;
 
     // Fix: Set User-Agent to avoid 406 Not Acceptable from GitHub protections
-    autoUpdater.requestHeaders = { "User-Agent": "CloudflareDesktop/1.0.0" };
+    const requestHeaders = { "User-Agent": "CloudflareDesktop/1.0.0" };
 
-    // SWITCH TO GENERIC PROVIDER FOR RELIABILITY
-    // The native GitHub provider can be flaky with API limits or 404s on fresh releases.
-    // Using 'generic' pointing to the '/latest/download/' URL is often more robust for public repos.
+    // Support Private Repos: Use GH_TOKEN from env if available
+    const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+    if (token) {
+        log.info('Using GitHub Token for updates');
+        requestHeaders['Authorization'] = `token ${token}`;
+    }
+
+    autoUpdater.requestHeaders = requestHeaders;
+
+    // REVERT TO GITHUB PROVIDER
+    // Since we fixed the 406 error with User-Agent, the native GitHub provider 
+    // is smarter than generic because it can find pre-releases and doesn't rely 
+    // on the 'latest' redirect working immediately.
     autoUpdater.setFeedURL({
-        provider: 'generic',
-        url: 'https://github.com/DM-WuzuanTW/cloudflare/releases/latest/download/'
+        provider: 'github',
+        owner: 'DM-WuzuanTW',
+        repo: 'cloudflare'
     });
 
     // Use checkForUpdates() instead of checkForUpdatesAndNotify() to suppress system notifications

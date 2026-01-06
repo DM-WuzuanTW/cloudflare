@@ -1,35 +1,50 @@
 const { app, BrowserWindow, ipcMain, safeStorage, shell, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 const path = require('path');
 const fs = require('fs');
 const cloudflare = require('./cloudflare-api');
 
-// Auto Updater Config
+// Configure Logging
+log.transports.file.level = 'info';
+autoUpdater.logger = log;
+log.info('App starting...');
+
+// Auto Updater Config - TRULY SILENT
+// autoDownload: true -> will download automatically without asking
+// autoInstallOnAppQuit: true -> will install seamlessly when user closes the app
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 
 // Setup Auto Updater Events
 function setupAutoUpdater() {
-    autoUpdater.on('update-available', () => {
-        console.log('Update available. Downloading...');
+    // Use checkForUpdates() instead of checkForUpdatesAndNotify() to suppress system notifications
+    autoUpdater.checkForUpdates();
+
+    autoUpdater.on('checking-for-update', () => {
+        log.info('Checking for update...');
     });
 
-    autoUpdater.on('update-downloaded', () => {
-        console.log('Update downloaded. It will be installed on quit.');
-        // Optional: Notify renderer to show a "Update Ready" badge
+    autoUpdater.on('update-available', (info) => {
+        log.info('Update available:', info.version);
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        log.info('Update not available.');
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        log.info('Update downloaded. It will be installed on quit.');
     });
 
     autoUpdater.on('error', (err) => {
-        console.error('Update error:', err);
+        log.error('Update error:', err);
     });
 
-    // Check immediately
-    autoUpdater.checkForUpdatesAndNotify();
-
-    // Check every hour
+    // Check every 30 minutes
     setInterval(() => {
-        autoUpdater.checkForUpdatesAndNotify();
-    }, 60 * 60 * 1000);
+        autoUpdater.checkForUpdates();
+    }, 30 * 60 * 1000);
 }
 
 // Store path
@@ -72,16 +87,10 @@ function createWindow() {
             nodeIntegration: false,
             contextIsolation: true
         },
-        // Premium Look: Transparent background for glass effect? 
-        // Usually standard window is better for functionality, but let's try a dark theme default
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#111111',
         show: false
     });
 
-    // Load Vite dev server or build
-    // For dev: http://localhost:5173 
-    // For prod: dist/index.html
-    // We'll assume dev for now or check args
     const isDev = !app.isPackaged;
     if (isDev) {
         mainWindow.loadURL('http://localhost:5173');
@@ -136,6 +145,24 @@ app.whenReady().then(() => {
         if (typeof cloudflare[method] !== 'function') throw new Error(`Method ${method} not found`);
 
         return await cloudflare[method](...args);
+    });
+
+    // System Handlers - Version & Manual Update
+    ipcMain.handle('app:get-version', () => app.getVersion());
+
+    ipcMain.handle('app:check-update', async () => {
+        try {
+            const result = await autoUpdater.checkForUpdates();
+            if (!result) return { success: false, error: 'No update info' };
+
+            return {
+                success: true,
+                updateAvailable: result.updateInfo.version !== app.getVersion(),
+                version: result.updateInfo.version
+            };
+        } catch (err) {
+            return { success: false, error: err.message };
+        }
     });
 
     app.on('activate', () => {

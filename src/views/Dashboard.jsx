@@ -6,6 +6,7 @@ import {
 import Zones from './Zones';
 import Workers from './Workers';
 import Pages from './Pages';
+import Settings from './Settings';
 
 export default function Dashboard({ user, onLogout }) {
     const [activeTab, setActiveTab] = useState('zones');
@@ -26,6 +27,7 @@ export default function Dashboard({ user, onLogout }) {
             case 'zones': return <Zones />;
             case 'workers': return <Workers />;
             case 'pages': return <Pages />;
+            case 'settings': return <Settings />;
             default: return (
                 <div style={{
                     display: 'flex',

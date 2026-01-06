@@ -82,14 +82,14 @@ export default function Settings() {
                 </div>
 
                 <div style={{ padding: '15px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontWeight: 500, marginBottom: 5 }}>Troubleshooting Logs</div>
-                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 10 }}>If you encounter update issues, check the logs here.</p>
+                    <div style={{ fontWeight: 500, marginBottom: 5 }}>{t('settings.troubleshoot')}</div>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 10 }}>{t('settings.troubleshoot_desc')}</p>
                     <button
                         className="btn btn-secondary"
                         onClick={() => window.electronAPI.openLogFolder()}
                         style={{ fontSize: 13 }}
                     >
-                        Open Log Folder
+                        {t('settings.open_logs')}
                     </button>
                 </div>
 
@@ -134,7 +134,7 @@ export default function Settings() {
                                             className="btn btn-primary"
                                             style={{ fontSize: 13, height: 32, padding: '0 12px', width: 'fit-content' }}
                                         >
-                                            <FaDownload style={{ marginRight: 6 }} /> Download Manually
+                                            <FaDownload style={{ marginRight: 6 }} /> {t('settings.download_manual')}
                                         </a>
                                     </div>
                                 )}

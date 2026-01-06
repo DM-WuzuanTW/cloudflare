@@ -1,10 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     FaNetworkWired, FaEdit, FaTrash, FaCloud, FaCloudShowersHeavy,
     FaPlus, FaSearch, FaTimes, FaCheck, FaGlobeAmericas, FaShieldAlt
 } from 'react-icons/fa';
 
 export default function DNS() {
+    const { t } = useTranslation();
     const [zones, setZones] = useState([]);
     const [selectedZone, setSelectedZone] = useState('');
     const [records, setRecords] = useState([]);
@@ -85,20 +87,20 @@ export default function DNS() {
             setIsModalOpen(false);
             loadRecords(selectedZone);
         } catch (err) {
-            alert('Operation failed: ' + err.message);
+            alert(t('dns_mgmt.alerts.op_failed') + err.message);
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (recordId) => {
-        if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) return;
+        if (!confirm(t('dns_mgmt.alerts.delete_confirm'))) return;
         setLoading(true);
         try {
             await window.electronAPI.invoke('deleteDNSRecord', selectedZone, recordId);
             loadRecords(selectedZone);
         } catch (err) {
-            alert('Delete failed: ' + err.message);
+            alert(t('dns_mgmt.alerts.delete_failed') + err.message);
             setLoading(false);
         }
     };
@@ -126,10 +128,10 @@ export default function DNS() {
                 <div>
                     <h2 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <FaNetworkWired style={{ color: 'var(--cf-orange)' }} />
-                        DNS Management
+                        {t('dns_mgmt.title')}
                     </h2>
                     <p style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 14 }}>
-                        Manage DNS records for your domains with ease.
+                        {t('dns_mgmt.subtitle')}
                     </p>
                 </div>
 
@@ -148,9 +150,9 @@ export default function DNS() {
 
             {/* Stats Row */}
             <div className="grid-cols-3" style={{ marginBottom: 24 }}>
-                <StatsCard label="Total Records" value={stats.total} icon={<FaNetworkWired />} color="#0051C3" />
-                <StatsCard label="Proxied" value={stats.proxied} icon={<FaCloud />} color="#F6821F" />
-                <StatsCard label="DNS Only" value={stats.dnsOnly} icon={<FaCloudShowersHeavy />} color="#666" />
+                <StatsCard label={t('dns_mgmt.total_records')} value={stats.total} icon={<FaNetworkWired />} color="#0051C3" />
+                <StatsCard label={t('dns_mgmt.proxied')} value={stats.proxied} icon={<FaCloud />} color="#F6821F" />
+                <StatsCard label={t('dns_mgmt.dns_only')} value={stats.dnsOnly} icon={<FaCloudShowersHeavy />} color="#666" />
             </div>
 
             {/* Controls */}
@@ -159,14 +161,14 @@ export default function DNS() {
                     <FaSearch style={{ color: 'var(--text-muted)' }} />
                     <input
                         style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', padding: '10px', width: '100%', outline: 'none' }}
-                        placeholder="Search records by name, content, or type..."
+                        placeholder={t('dns_mgmt.search_placeholder')}
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                     />
                     {searchQuery && <FaTimes style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setSearchQuery('')} />}
                 </div>
                 <button className="btn btn-primary" onClick={handleAddNew} style={{ padding: '0 24px', height: 42 }}>
-                    <FaPlus /> Add Record
+                    <FaPlus /> {t('dns_mgmt.add_record')}
                 </button>
             </div>
 
@@ -176,25 +178,25 @@ export default function DNS() {
                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
                         <thead>
                             <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-subtle)', textAlign: 'left', fontSize: 13, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-                                <th style={{ padding: '16px 24px', width: 80 }}>Type</th>
-                                <th style={{ padding: '16px 24px' }}>Name</th>
-                                <th style={{ padding: '16px 24px' }}>Content</th>
-                                <th style={{ padding: '16px 24px', width: 100 }}>Proxy Status</th>
-                                <th style={{ padding: '16px 24px', width: 80 }}>TTL</th>
-                                <th style={{ padding: '16px 24px', width: 100, textAlign: 'right' }}>Actions</th>
+                                <th style={{ padding: '16px 24px', width: 80 }}>{t('dns_mgmt.table.type')}</th>
+                                <th style={{ padding: '16px 24px' }}>{t('dns_mgmt.table.name')}</th>
+                                <th style={{ padding: '16px 24px' }}>{t('dns_mgmt.table.content')}</th>
+                                <th style={{ padding: '16px 24px', width: 100 }}>{t('dns_mgmt.table.proxy_status')}</th>
+                                <th style={{ padding: '16px 24px', width: 80 }}>{t('dns_mgmt.table.ttl')}</th>
+                                <th style={{ padding: '16px 24px', width: 100, textAlign: 'right' }}>{t('dns_mgmt.table.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading && records.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                        Loading records...
+                                        {t('dns_mgmt.table.loading')}
                                     </td>
                                 </tr>
                             ) : filteredRecords.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                        {searchQuery ? 'No matching records found.' : 'No DNS records found for this zone.'}
+                                        {searchQuery ? t('dns_mgmt.table.no_match') : t('dns_mgmt.table.no_records')}
                                     </td>
                                 </tr>
                             ) : (
@@ -214,16 +216,16 @@ export default function DNS() {
                                         <td style={{ padding: '16px 24px' }}>
                                             {r.proxied ? (
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--cf-orange)' }}>
-                                                    <FaCloud /> <span style={{ fontSize: 13, fontWeight: 500 }}>Proxied</span>
+                                                    <FaCloud /> <span style={{ fontSize: 13, fontWeight: 500 }}>{t('dns_mgmt.proxied')}</span>
                                                 </div>
                                             ) : (
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)' }}>
-                                                    <FaCloudShowersHeavy /> <span style={{ fontSize: 13 }}>DNS Only</span>
+                                                    <FaCloudShowersHeavy /> <span style={{ fontSize: 13 }}>{t('dns_mgmt.dns_only')}</span>
                                                 </div>
                                             )}
                                         </td>
                                         <td style={{ padding: '16px 24px', color: 'var(--text-secondary)' }}>
-                                            {r.ttl === 1 ? 'Auto' : `${r.ttl}s`}
+                                            {r.ttl === 1 ? t('dns_mgmt.modal.ttl_auto') : `${r.ttl}s`}
                                         </td>
                                         <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
@@ -248,7 +250,7 @@ export default function DNS() {
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
                     <div className="card" style={{ width: 500, padding: 0, border: '1px solid var(--border-active)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
                         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ fontSize: 18 }}>{editingRecord ? 'Edit DNS Record' : 'Add DNS Record'}</h3>
+                            <h3 style={{ fontSize: 18 }}>{editingRecord ? t('dns_mgmt.modal.edit_title') : t('dns_mgmt.modal.add_title')}</h3>
                             <FaTimes style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setIsModalOpen(false)} />
                         </div>
 
@@ -256,15 +258,15 @@ export default function DNS() {
                             <div style={{ display: 'grid', gap: 20 }}>
                                 <div className="grid-cols-2" style={{ gap: 16 }}>
                                     <div className="input-group">
-                                        <label className="input-label">Type</label>
+                                        <label className="input-label">{t('dns_mgmt.modal.type')}</label>
                                         <select className="input" value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
                                             {['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS', 'SRV'].map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
                                     </div>
                                     <div className="input-group">
-                                        <label className="input-label">TTL</label>
+                                        <label className="input-label">{t('dns_mgmt.modal.ttl')}</label>
                                         <select className="input" value={formData.ttl} onChange={e => setFormData({ ...formData, ttl: Number(e.target.value) })}>
-                                            <option value={1}>Auto</option>
+                                            <option value={1}>{t('dns_mgmt.modal.ttl_auto')}</option>
                                             <option value={60}>1 min</option>
                                             <option value={120}>2 mins</option>
                                             <option value={300}>5 mins</option>
@@ -274,15 +276,15 @@ export default function DNS() {
                                 </div>
 
                                 <div className="input-group">
-                                    <label className="input-label">Name</label>
-                                    <input className="input" placeholder="e.g. www (use @ for root)" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+                                    <label className="input-label">{t('dns_mgmt.modal.name_label')}</label>
+                                    <input className="input" placeholder={t('dns_mgmt.modal.name_placeholder')} value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                                 </div>
 
                                 <div className="input-group">
-                                    <label className="input-label">Content</label>
+                                    <label className="input-label">{t('dns_mgmt.modal.content_label')}</label>
                                     <textarea
                                         className="input"
-                                        placeholder="IPv4 address (e.g. 1.2.3.4) or target domain"
+                                        placeholder={t('dns_mgmt.modal.content_placeholder')}
                                         rows={3}
                                         style={{ resize: 'vertical', minHeight: 80, fontFamily: 'monospace' }}
                                         value={formData.content}
@@ -292,7 +294,7 @@ export default function DNS() {
                                 </div>
 
                                 <div className="input-group">
-                                    <label className="input-label">Proxy Status</label>
+                                    <label className="input-label">{t('dns_mgmt.modal.proxy_status')}</label>
                                     <div
                                         onClick={() => setFormData({ ...formData, proxied: !formData.proxied })}
                                         style={{
@@ -305,9 +307,9 @@ export default function DNS() {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                             {formData.proxied ? <FaCloud size={20} color="var(--cf-orange)" /> : <FaCloudShowersHeavy size={20} color="var(--text-muted)" />}
                                             <div>
-                                                <div style={{ fontWeight: 600, fontSize: 14 }}>{formData.proxied ? 'Proxied' : 'DNS Only'}</div>
+                                                <div style={{ fontWeight: 600, fontSize: 14 }}>{formData.proxied ? t('dns_mgmt.proxied') : t('dns_mgmt.dns_only')}</div>
                                                 <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-                                                    {formData.proxied ? 'Traffic is accelerated and protected by Cloudflare.' : 'Traffic bypasses Cloudflare causing exposure.'}
+                                                    {formData.proxied ? t('dns_mgmt.modal.proxied_desc') : t('dns_mgmt.modal.dns_only_desc')}
                                                 </div>
                                             </div>
                                         </div>
@@ -317,9 +319,9 @@ export default function DNS() {
                             </div>
 
                             <div style={{ marginTop: 32, display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-                                <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                                <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>{t('dns_mgmt.modal.cancel')}</button>
                                 <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? 'Saving...' : 'Save Record'}
+                                    {loading ? t('dns_mgmt.modal.saving') : t('dns_mgmt.modal.save')}
                                 </button>
                             </div>
                         </form>

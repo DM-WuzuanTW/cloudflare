@@ -7,6 +7,12 @@ echo ========================================================
 echo       Cloudflare Desktop - Auto Release Tool
 echo ========================================================
 
+REM Listen for user input - Force clean previous git locks if any
+if exist ".git\index.lock" (
+    echo [Fix] Removing stale git index.lock...
+    del ".git\index.lock"
+)
+
 REM Check Node.js
 where node >nul 2>nul
 if %errorlevel% neq 0 (
@@ -16,54 +22,61 @@ if %errorlevel% neq 0 (
 )
 
 REM --- AUTO-DETECT GITHUB TOKEN ---
-REM 1. Check current session
 if not "%GH_TOKEN%"=="" goto TokenFound
-REM 2. Check system environment (in case it was set but not loaded in this session yet)
 for /f "tokens=3*" %%a in ('reg query HKCU\Environment /v GH_TOKEN 2^>nul') do set GH_TOKEN=%%a
 if not "%GH_TOKEN%"=="" goto TokenFound
 
-
-REM 3. Try GitHub CLI
+REM Try GitHub CLI
 where gh >nul 2>nul
 if %errorlevel% equ 0 (
-    echo [Info] GitHub CLI detected. Attempting to fetch auth token...
+    echo [Info] GitHub CLI detected. Fetching token...
     for /f %%t in ('gh auth token') do set GH_TOKEN=%%t
 )
 if not "%GH_TOKEN%"=="" goto TokenFound
 
-REM 4. IF STILL MISSING: ONE-TIME PROMPT
 echo.
-echo [!] Electron-Builder needs a specific API Token to upload files.
-echo     (This is different from your Git login)
-echo.
-echo     We need this ONLY ONCE. I will save it to your system for you.
-echo.
-set /p "GH_TOKEN=Please paste your GitHub Token (ghp_...): "
-
+echo [!] Electron-Builder needs a GitHub Token to release.
+set /p "GH_TOKEN=Please paste your GitHub Token: "
 if "%GH_TOKEN%"=="" (
-    echo.
-    echo [Error] No token provided. I cannot upload the release files.
-    echo         The build will finish, but you will have to upload manually.
+    echo [Error] No token. Cannot release.
     pause
     exit /b
 ) else (
-    echo.
-    echo [Setup] Saving token to system environment variables...
     setx GH_TOKEN "%GH_TOKEN%"
-    echo [Setup] Token saved! You won't need to do this again.
 )
 
 :TokenFound
-REM Export to environment for electron-builder
 set GH_TOKEN=%GH_TOKEN%
 
+REM --- VERSION MANAGEMENT ---
+for /f "delims=" %%v in ('node -p "require('./package.json').version"') do set PROJ_VERSION=%%v
 
-REM --- GET VERSION ---
+echo.
+echo Current Version: v%PROJ_VERSION%
+echo.
+echo Select action:
+echo [1] Use current version (v%PROJ_VERSION%) - You manually updated package.json
+echo [2] Auto-increment Patch (v%PROJ_VERSION% + 0.0.1)
+echo [3] Auto-increment Minor
+echo.
+set /p "CHOICE=Enter choice (1/2/3) [Default: 2]: "
+if "%CHOICE%"=="" set CHOICE=2
+
+if "%CHOICE%"=="2" (
+    echo [Update] Bumping Patch version...
+    call npm version patch --no-git-tag-version
+)
+if "%CHOICE%"=="3" (
+    echo [Update] Bumping Minor version...
+    call npm version minor --no-git-tag-version
+)
+
+REM Re-read version after update
 for /f "delims=" %%v in ('node -p "require('./package.json').version"') do set VERSION=%%v
 
 echo.
 echo --------------------------------------------------------
-echo  Target Release Version: v%VERSION%
+echo  Releasing Version: v%VERSION%
 echo --------------------------------------------------------
 echo.
 
@@ -71,25 +84,17 @@ REM --- GIT OPERATIONS ---
 echo [Step 1/3] Syncing Git Repository...
 git add .
 call git commit -m "chore: release v!VERSION!" >nul 2>&1
-if %errorlevel% equ 0 (
-    echo    - Changes committed.
-) else (
-    echo    - No changes to commit.
-)
+echo    - Code committed.
 
-echo    - Pushing code to GitHub...
+echo    - Pushing to GitHub...
 call git push origin main
 
 REM Handle Tag
-call git tag v!VERSION! >nul 2>&1
-if %errorlevel% equ 0 (
-    echo    - Created tag v!VERSION!
-    call git push origin v!VERSION!
-) else (
-    echo    - Tag v!VERSION! already exists or failed. (Checking if remote needs update)
-    call git push origin v!VERSION! >nul 2>&1
-)
-
+echo    - Tagging release v!VERSION!...
+call git tag -d v!VERSION! >nul 2>&1
+call git push origin :refs/tags/v!VERSION! >nul 2>&1
+call git tag v!VERSION!
+call git push origin v!VERSION!
 
 REM --- BUILD & PUBLISH ---
 echo.
@@ -98,18 +103,11 @@ call npm run build
 
 echo.
 echo [Step 3/3] Packaging and Uploading to GitHub...
-echo    - This may take a few minutes. Please wait.
-
-REM Run electron-builder with publish flag
 call npx electron-builder --win --publish always
 
 if %errorlevel% neq 0 (
     echo.
-    echo [X] Error occurred.
-    echo     Possible reasons:
-    echo     1. Token is invalid or expired.
-    echo     2. Network issue.
-    echo     3. Tag already exists as a draft release.
+    echo [X] Build/Publish Failed.
     pause
     exit /b
 )

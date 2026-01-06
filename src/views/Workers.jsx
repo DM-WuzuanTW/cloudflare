@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { FaHammer, FaPlay, FaHistory, FaCodeBranch } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 export default function Workers() {
+    const { t } = useTranslation();
     const [accounts, setAccounts] = useState([]);
     const [scripts, setScripts] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(null);
@@ -29,14 +31,14 @@ export default function Workers() {
             .catch(() => setLoading(false));
     };
 
-    if (loading && accounts.length === 0) return <div>Loading Workers...</div>;
+    if (loading && accounts.length === 0) return <div>{t('workers.loading')}</div>;
 
     return (
         <div>
             <div className="page-header">
                 <div>
-                    <h2 className="page-title">Workers & KV</h2>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '5px 0 0 0' }}>Deploy serverless code instantly across the globe.</p>
+                    <h2 className="page-title">{t('workers.title')}</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '5px 0 0 0' }}>{t('workers.subtitle')}</p>
                 </div>
 
                 {accounts.length > 0 && (
@@ -47,13 +49,13 @@ export default function Workers() {
                             onChange={e => { setSelectedAccount(e.target.value); fetchScripts(e.target.value); }}
                             value={selectedAccount || ''}
                         >
-                            {accounts.map(a => <option key={a.id} value={a.id}>{a.name}'s Account</option>)}
+                            {accounts.map(a => <option key={a.id} value={a.id}>{a.name}{t('workers.account')}</option>)}
                         </select>
                     </div>
                 )}
             </div>
 
-            {scripts.length === 0 ? <div className="text-secondary">No workers found.</div> : (
+            {scripts.length === 0 ? <div className="text-secondary">{t('workers.no_workers')}</div> : (
                 <div className="grid-cols-3">
                     {scripts.map(script => (
                         <div key={script.id} className="card">
@@ -71,10 +73,10 @@ export default function Workers() {
 
                             <div style={{ marginTop: 15, display: 'flex', gap: 8 }}>
                                 <button className="btn btn-secondary" style={{ fontSize: 12, flex: 1 }}>
-                                    <FaHistory style={{ marginRight: 4 }} /> Logs
+                                    <FaHistory style={{ marginRight: 4 }} /> {t('workers.btn_logs')}
                                 </button>
                                 <button className="btn btn-primary" style={{ fontSize: 12, flex: 1, backgroundColor: '#2da44e', borderColor: '#2da44e' }}>
-                                    <FaPlay style={{ marginRight: 4, fontSize: 10 }} /> Deploy
+                                    <FaPlay style={{ marginRight: 4, fontSize: 10 }} /> {t('workers.btn_deploy')}
                                 </button>
                             </div>
                         </div>

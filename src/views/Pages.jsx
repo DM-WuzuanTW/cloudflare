@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { FaFileCode, FaExternalLinkAlt, FaGitAlt } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 export default function Pages() {
+    const { t } = useTranslation();
     const [accounts, setAccounts] = useState([]);
     const [projects, setProjects] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(null);
@@ -27,14 +29,14 @@ export default function Pages() {
             .catch(() => setLoading(false));
     };
 
-    if (loading && accounts.length === 0) return <div>Loading Pages...</div>;
+    if (loading && accounts.length === 0) return <div>{t('pages.loading')}</div>;
 
     return (
         <div>
             <div className="page-header">
                 <div>
-                    <h2 className="page-title">Cloudflare Pages</h2>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '5px 0 0 0' }}>Build and deploy full-stack applications.</p>
+                    <h2 className="page-title">{t('pages.title')}</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '5px 0 0 0' }}>{t('pages.subtitle')}</p>
                 </div>
                 {accounts.length > 0 && (
                     <select
@@ -53,16 +55,16 @@ export default function Pages() {
                     <div key={project.name} className="card">
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <h3 style={{ fontSize: 18 }}>{project.name}</h3>
-                            <span className="badge badge-success">Active</span>
+                            <span className="badge badge-success">{t('pages.status_active')}</span>
                         </div>
 
                         <div style={{ margin: '15px 0', padding: 12, background: 'var(--bg-app)', borderRadius: 6, fontSize: 13 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, color: 'var(--text-secondary)' }}>
-                                <FaGitAlt /> Source
+                                <FaGitAlt /> {t('pages.source')}
                             </div>
                             <div style={{ color: 'var(--text-primary)' }}>
                                 {project.production_branch}
-                                <span style={{ color: 'var(--text-muted)' }}> • {project.source?.type || 'Direct Upload'}</span>
+                                <span style={{ color: 'var(--text-muted)' }}> • {project.source?.type || t('pages.direct')}</span>
                             </div>
                         </div>
 

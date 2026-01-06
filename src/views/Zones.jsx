@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { FaSync, FaGlobe, FaCheckCircle, FaExclamationCircle, FaArrowRight } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 export default function Zones() {
+    const { t } = useTranslation();
     const [zones, setZones] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -22,7 +24,7 @@ export default function Zones() {
 
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-secondary)' }}>
-            <FaSync className="spin" /> Loading Zones...
+            <FaSync className="spin" /> {t('zones.loading')}
         </div>
     );
 
@@ -30,13 +32,13 @@ export default function Zones() {
         <div>
             <div className="page-header">
                 <div>
-                    <h2 className="page-title">Website Zones</h2>
+                    <h2 className="page-title">{t('zones.title')}</h2>
                     <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '5px 0 0 0' }}>
-                        Manage your domains and site configurations.
+                        {t('zones.subtitle')}
                     </p>
                 </div>
                 <button className="btn btn-secondary" onClick={loadZones}>
-                    <FaSync /> Refresh
+                    <FaSync /> {t('zones.refresh')}
                 </button>
             </div>
 
@@ -50,19 +52,19 @@ export default function Zones() {
                                     <h3 style={{ fontSize: 18 }}>{zone.name}</h3>
                                 </div>
                                 <div style={{ marginTop: 8, fontSize: 13, color: 'var(--text-secondary)' }}>
-                                    Plan: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{zone.plan.name}</span>
+                                    {t('zones.plan')}: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{zone.plan.name}</span>
                                 </div>
                             </div>
                             <span className={`badge ${zone.status === 'active' ? 'badge-success' : 'badge-warning'}`}>
                                 {zone.status === 'active' && <FaCheckCircle style={{ marginRight: 4, fontSize: 10 }} />}
                                 {zone.status !== 'active' && <FaExclamationCircle style={{ marginRight: 4, fontSize: 10 }} />}
-                                {zone.status.toUpperCase()}
+                                {zone.status === 'active' ? t('zones.status_active') : t('zones.status_pending')}
                             </span>
                         </div>
 
                         <div style={{ marginTop: 20, borderTop: '1px solid var(--border-subtle)', paddingTop: 16, display: 'flex', gap: 10 }}>
-                            <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}>DNS</button>
-                            <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}>Cache</button>
+                            <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}>{t('zones.btn_dns')}</button>
+                            <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}>{t('zones.btn_cache')}</button>
                             <button className="btn btn-primary" style={{ width: 40 }}>
                                 <FaArrowRight />
                             </button>

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { FaShieldAlt, FaKey, FaEnvelope } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 export default function Login({ onLogin }) {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [key, setKey] = useState('');
     const [loading, setLoading] = useState(false);
@@ -25,12 +27,13 @@ export default function Login({ onLogin }) {
                     <div style={{ padding: 12, background: 'rgba(246, 130, 31, 0.1)', borderRadius: '50%', color: 'var(--cf-orange)', fontSize: 32 }}>
                         <FaShieldAlt />
                     </div>
-                    <h2 style={{ fontSize: 24 }}>Cloudflare Mobile</h2>
+                    <h2 style={{ fontSize: 24 }}>{t('login.title')}</h2>
+                    <p style={{ color: 'var(--text-secondary)' }}>{t('login.subtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div className="input-group">
-                        <span className="input-label">Email Address</span>
+                        <span className="input-label">{t('login.email')}</span>
                         <div style={{ position: 'relative' }}>
                             <FaEnvelope style={{ position: 'absolute', left: 12, top: 12, color: 'var(--text-muted)' }} />
                             <input
@@ -46,13 +49,13 @@ export default function Login({ onLogin }) {
                     </div>
 
                     <div className="input-group">
-                        <span className="input-label">Global API Key</span>
+                        <span className="input-label">{t('login.key')}</span>
                         <div style={{ position: 'relative' }}>
                             <FaKey style={{ position: 'absolute', left: 12, top: 12, color: 'var(--text-muted)' }} />
                             <input
                                 className="input"
                                 style={{ paddingLeft: 36 }}
-                                placeholder="Your Global API Key"
+                                placeholder="Global API Key"
                                 value={key}
                                 onChange={e => setKey(e.target.value)}
                                 required
@@ -62,11 +65,11 @@ export default function Login({ onLogin }) {
                     </div>
 
                     <button className="btn btn-primary" disabled={loading} style={{ height: 44, fontSize: 16 }}>
-                        {loading ? 'Verifying Credentials...' : 'Sign In securely'}
+                        {loading ? t('login.btn_verify') : t('login.btn_signin')}
                     </button>
                 </form>
                 <p style={{ marginTop: '24px', fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                    Your credentials are encrypted using <strong>AES-256</strong> and stored ONLY on your local device. We never see your keys.
+                    {t('login.disclaimer')}
                 </p>
             </div>
         </div>

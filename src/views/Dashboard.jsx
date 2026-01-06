@@ -3,23 +3,25 @@ import {
     FaChartPie, FaGlobe, FaNetworkWired, FaShieldAlt,
     FaBolt, FaHammer, FaFileCode, FaCog, FaSignOutAlt
 } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import Zones from './Zones';
 import Workers from './Workers';
 import Pages from './Pages';
 import Settings from './Settings';
 
 export default function Dashboard({ user, onLogout }) {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('zones');
 
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: <FaChartPie /> },
-        { id: 'zones', label: 'Websites (Zones)', icon: <FaGlobe /> },
-        { id: 'dns', label: 'DNS', icon: <FaNetworkWired /> },
-        { id: 'security', label: 'Security', icon: <FaShieldAlt /> },
-        { id: 'cache', label: 'Caching', icon: <FaBolt /> },
-        { id: 'workers', label: 'Workers & KV', icon: <FaHammer /> },
-        { id: 'pages', label: 'Pages', icon: <FaFileCode /> },
-        { id: 'settings', label: 'Settings', icon: <FaCog /> },
+        { id: 'dashboard', label: t('sidebar.dashboard'), icon: <FaChartPie /> },
+        { id: 'zones', label: t('sidebar.zones'), icon: <FaGlobe /> },
+        { id: 'dns', label: t('sidebar.dns'), icon: <FaNetworkWired /> },
+        { id: 'security', label: t('sidebar.security'), icon: <FaShieldAlt /> },
+        { id: 'cache', label: t('sidebar.cache'), icon: <FaBolt /> },
+        { id: 'workers', label: t('sidebar.workers'), icon: <FaHammer /> },
+        { id: 'pages', label: t('sidebar.pages'), icon: <FaFileCode /> },
+        { id: 'settings', label: t('sidebar.settings'), icon: <FaCog /> },
     ];
 
     const renderContent = () => {
@@ -38,8 +40,8 @@ export default function Dashboard({ user, onLogout }) {
                     color: 'var(--text-secondary)'
                 }}>
                     <FaCog style={{ fontSize: 48, marginBottom: 20, opacity: 0.2 }} />
-                    <h2 style={{ color: 'var(--text-primary)', marginBottom: 10 }}>Coming Soon</h2>
-                    <p>The {activeTab} module is under development.</p>
+                    <h2 style={{ color: 'var(--text-primary)', marginBottom: 10 }}>{t('common.coming_soon')}</h2>
+                    <p>{t('common.dev_module', { module: t(`sidebar.${activeTab}`) })}</p>
                 </div>
             );
         }
@@ -54,7 +56,7 @@ export default function Dashboard({ user, onLogout }) {
                         <div style={{ width: 28, height: 28, background: 'var(--cf-orange)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 16, color: '#fff' }}>
                             <FaBolt />
                         </div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>Cloudflare</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{t('sidebar.welcome')}</div>
                     </div>
                     <p style={{ margin: '8px 0 0 0', fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {user}
@@ -81,7 +83,7 @@ export default function Dashboard({ user, onLogout }) {
                         style={{ width: '100%', justifyContent: 'flex-start', color: '#ff6b6b' }}
                     >
                         <FaSignOutAlt style={{ marginRight: 12 }} />
-                        Log Out
+                        {t('sidebar.logout')}
                     </button>
                 </div>
             </div>

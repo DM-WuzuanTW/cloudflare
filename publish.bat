@@ -119,20 +119,44 @@ where gh >nul 2>nul
 if %errorlevel% equ 0 (
     REM Create release if not exists (idempotent-ish)
     echo    - Ensuring Release v%VERSION% exists...
-    call gh release create v%VERSION% --title "v%VERSION%" --notes "Auto-generated release v%VERSION%" --verify-tag >nul 2>&1
+    call gh release create v%VERSION% --title "Release v%VERSION%" --notes "Auto-generated release v%VERSION%" --verify-tag >nul 2>&1
     
-    REM Upload assets manually just in case electron-builder missed it
+    REM Upload assets manually - electron-builder sometimes fails to upload
+    echo    - Uploading release assets...
+    
     if exist "release\latest.yml" (
-        echo    - [Critical] Force uploading latest.yml...
+        echo      ^> Uploading latest.yml...
         call gh release upload v%VERSION% "release\latest.yml" --clobber
+    ) else (
+        echo      [ERROR] latest.yml not found!
     )
     
     if exist "release\Cloudflare Desktop Setup %VERSION%.exe" (
-        echo    - [Backup] Uploading Setup exe...
+        echo      ^> Uploading installer exe...
         call gh release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe" --clobber
+    ) else (
+        echo      [ERROR] Installer exe not found!
     )
+    
+    if exist "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" (
+        echo      ^> Uploading blockmap...
+        call gh release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" --clobber
+    ) else (
+        echo      [WARNING] Blockmap not found (delta updates disabled)
+    )
+    
+    echo    - Upload complete!
 ) else (
-    echo [Warning] GitHub CLI (gh) not found. Skipping manual verification.
+    echo.
+    echo [ERROR] GitHub CLI (gh) is REQUIRED but not installed!
+    echo.
+    echo Please install GitHub CLI from: https://cli.github.com/
+    echo OR run: winget install GitHub.cli
+    echo.
+    echo After installation, run: gh auth login
+    echo.
+    pause
+    exit /b 1
 )
 
 echo.

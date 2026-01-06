@@ -112,6 +112,16 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
+REM --- FORCE UPLOAD LATEST.YML ---
+where gh >nul 2>nul
+if %errorlevel% equ 0 (
+    if exist "release\latest.yml" (
+        echo.
+        echo [Fix] Manually uploading latest.yml to ensure auto-updates work...
+        call gh release upload v%VERSION% release/latest.yml --clobber
+    )
+)
+
 echo.
 echo ========================================================
 echo  SUCCESS! Release v%VERSION% is live.

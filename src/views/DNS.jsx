@@ -6,6 +6,8 @@ export default function DNS() {
     const [selectedZone, setSelectedZone] = useState('');
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newRecord, setNewRecord] = useState({ type: 'A', name: '', content: '', proxied: true, ttl: 1 });
 
     useEffect(() => {
         // Load zones for selection
@@ -32,6 +34,34 @@ export default function DNS() {
         loadRecords(zid);
     };
 
+    const handleCreate = async (e) => {
+        e.preventDefault();
+        if (!newRecord.name || !newRecord.content) return;
+        setLoading(true);
+        try {
+            await window.electronAPI.invoke('createDNSRecord', selectedZone, newRecord);
+            setShowAddForm(false);
+            setNewRecord({ type: 'A', name: '', content: '', proxied: true, ttl: 1 });
+            loadRecords(selectedZone);
+        } catch (err) {
+            alert('Failed to create record: ' + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (recordId) => {
+        if (!confirm('Are you sure you want to delete this record?')) return;
+        setLoading(true);
+        try {
+            await window.electronAPI.invoke('deleteDNSRecord', selectedZone, recordId);
+            loadRecords(selectedZone);
+        } catch (err) {
+            alert('Delete failed: ' + err.message);
+            setLoading(false);
+        }
+    };
+
     return (
         <div>
             <div className="page-header">
@@ -47,8 +77,36 @@ export default function DNS() {
             <div className="card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
                     <h3>DNS Records</h3>
-                    <button className="btn btn-primary"><FaPlus /> Add Record</button>
+                    <button className="btn btn-primary" onClick={() => setShowAddForm(!showAddForm)}>
+                        <FaPlus /> {showAddForm ? 'Cancel' : 'Add Record'}
+                    </button>
                 </div>
+
+                {showAddForm && (
+                    <form onSubmit={handleCreate} style={{ padding: 20, background: 'var(--bg-app)', marginBottom: 20, borderRadius: 8, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                            <label style={{ fontSize: 12 }}>Type</label>
+                            <select className="input" value={newRecord.type} onChange={e => setNewRecord({ ...newRecord, type: e.target.value })} style={{ width: 100 }}>
+                                {['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS'].map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
+                            <label style={{ fontSize: 12 }}>Name (@ for root)</label>
+                            <input className="input" placeholder="e.g. www" value={newRecord.name} onChange={e => setNewRecord({ ...newRecord, name: e.target.value })} required />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 2 }}>
+                            <label style={{ fontSize: 12 }}>Content</label>
+                            <input className="input" placeholder="IP address or domain" value={newRecord.content} onChange={e => setNewRecord({ ...newRecord, content: e.target.value })} required />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                            <label style={{ fontSize: 12 }}>Proxy</label>
+                            <div style={{ display: 'flex', alignItems: 'center', height: 44, padding: '0 10px', background: 'var(--bg-input)', borderRadius: 4, cursor: 'pointer' }} onClick={() => setNewRecord({ ...newRecord, proxied: !newRecord.proxied })}>
+                                {newRecord.proxied ? <FaCloud style={{ color: '#F6821F' }} /> : <FaCloudShowersHeavy style={{ color: '#666' }} />}
+                            </div>
+                        </div>
+                        <button className="btn btn-primary" type="submit">Save</button>
+                    </form>
+                )}
 
                 {loading ? <div>Loading records...</div> : (
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
@@ -77,8 +135,7 @@ export default function DNS() {
                                     <td style={{ padding: 10 }}>{r.ttl === 1 ? 'Auto' : r.ttl}</td>
                                     <td style={{ padding: 10 }}>
                                         <div style={{ display: 'flex', gap: 10 }}>
-                                            <FaEdit style={{ cursor: 'pointer', color: 'var(--text-secondary)' }} />
-                                            <FaTrash style={{ cursor: 'pointer', color: 'var(--status-error-text)' }} />
+                                            <FaTrash style={{ cursor: 'pointer', color: 'var(--status-error-text)' }} title="Delete" onClick={() => handleDelete(r.id)} />
                                         </div>
                                     </td>
                                 </tr>

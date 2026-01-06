@@ -1,6 +1,6 @@
 {
     "name": "cloudflare-desktop-panel",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Premium Desktop Control Panel for Cloudflare",
     "repository": {
         "type": "git",
@@ -35,13 +35,11 @@
             "allowToChangeInstallationDirectory": true,
             "deleteAppDataOnUninstall": true
         },
-        "publish": [
-            {
-                "provider": "github",
-                "owner": "DM-WuzuanTW",
-                "repo": "cloudflare"
-            }
-        ]
+        "publish": {
+            "provider": "github",
+            "owner": "DM-WuzuanTW",
+            "repo": "cloudflare"
+        }
     },
     "keywords": [],
     "license": "ISC",

@@ -10,3 +10,51 @@ v1.0.7
 [Info] Target Release Version: v1.0.7 
 [Step 1/3] Syncing Git Repository... 
    - Git Adding all files... 
+warning: in the working copy of 'publish_log.txt', LF will be replaced by CRLF the next time Git touches it
+   - Committing changes... 
+[main 01c755b] chore: release v1.0.7
+ 7 files changed, 127 insertions(+), 68 deletions(-)
+ create mode 100644 publish_log.txt
+   - Pushing to branch main... 
+To https://github.com/DM-WuzuanTW/cloudflare.git
+   fdaf4a1..01c755b  main -> main
+   - Handling Tags... 
+error: tag 'v1.0.7' not found.
+To https://github.com/DM-WuzuanTW/cloudflare.git
+ - [deleted]         v1.0.7
+To https://github.com/DM-WuzuanTW/cloudflare.git
+ * [new tag]         v1.0.7 -> v1.0.7
+[Step 2/3] Building Source Code... 
+
+> cloudflare-desktop-panel@1.0.7 build
+> vite build
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 42 modules transformed.
+[31mx[39m Build failed in 224ms
+[31merror during build:
+[31m[vite:esbuild] Transform failed with 1 error:
+D:/開發/鑽石託管/cloudflare/src/views/Settings.jsx:152:11: ERROR: Unterminated regular expression[31m
+file: [36mD:/開發/鑽石託管/cloudflare/src/views/Settings.jsx:152:11[31m
+[33m
+[33mUnterminated regular expression[33m
+150|              </div>
+151|          </div>
+152|      </div >
+   |             ^
+153|    );
+154|  }
+[31m
+    at failureErrorWithLog (D:\開發\鑽石託管\cloudflare\node_modules\esbuild\lib\main.js:1472:15)
+    at D:\開發\鑽石託管\cloudflare\node_modules\esbuild\lib\main.js:755:50
+    at responseCallbacks.<computed> (D:\開發\鑽石託管\cloudflare\node_modules\esbuild\lib\main.js:622:9)
+    at handleIncomingPacket (D:\開發\鑽石託管\cloudflare\node_modules\esbuild\lib\main.js:677:12)
+    at Socket.readFromStdout (D:\開發\鑽石託管\cloudflare\node_modules\esbuild\lib\main.js:600:7)
+    at Socket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)[39m
+[Error] Vite Build Failed. Check log. 

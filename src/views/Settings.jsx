@@ -81,6 +81,18 @@ export default function Settings() {
                     <div className="badge" style={{ background: 'var(--bg-input)', fontSize: 14 }}>v{version}</div>
                 </div>
 
+                <div style={{ padding: '15px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontWeight: 500, marginBottom: 5 }}>Troubleshooting Logs</div>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 10 }}>If you encounter update issues, check the logs here.</p>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => window.electronAPI.openLogFolder()}
+                        style={{ fontSize: 13 }}
+                    >
+                        Open Log Folder
+                    </button>
+                </div>
+
                 <div style={{ padding: '20px 0' }}>
                     <div style={{ marginBottom: 15, fontWeight: 500 }}>{t('settings.update_title')}</div>
 
@@ -134,21 +146,6 @@ export default function Settings() {
                     </p>
                 </div>
             </div>
-
-            <div style={{ padding: '20px 0', borderTop: '1px solid var(--border-subtle)' }}>
-                <div style={{ marginBottom: 15, fontWeight: 500 }}>Troubleshooting</div>
-                <button
-                    className="btn btn-secondary"
-                    onClick={() => window.electronAPI.openLogFolder()}
-                >
-                    <FaFileCode style={{ marginRight: 8 }} /> Open Update Logs
-                </button>
-                <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
-                    If you have issues with auto-updates, check the update logs.
-                    <br />For publish/build logs, verify <code>publish_log.txt</code> in your project folder.
-                </p>
-            </div>
         </div>
-    </div >
-  );
+    );
 }

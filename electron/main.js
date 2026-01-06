@@ -7,8 +7,11 @@ const cloudflare = require('./cloudflare-api');
 
 // Configure Logging
 log.transports.file.level = 'info';
+// Force log path to be consistent
+log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
 autoUpdater.logger = log;
 log.info('App starting...');
+log.info('Version:', app.getVersion());
 
 // Auto Updater Config - TRULY SILENT
 // autoDownload: true -> will download automatically without asking
@@ -162,6 +165,13 @@ app.whenReady().then(() => {
 
     // System Handlers - Version & Manual Update
     ipcMain.handle('app:get-version', () => app.getVersion());
+    ipcMain.handle('app:get-log-path', () => path.join(app.getPath('userData'), 'logs', 'main.log'));
+    ipcMain.handle('app:open-log-folder', () => {
+        const logDir = path.join(app.getPath('userData'), 'logs');
+        if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+        shell.openPath(logDir);
+        return true;
+    });
 
     ipcMain.handle('app:check-update', async () => {
         try {
@@ -176,14 +186,6 @@ app.whenReady().then(() => {
         } catch (err) {
             return { success: false, error: err.message };
         }
-    });
-
-    ipcMain.handle('app:open-log-folder', () => {
-        // electron-log default path on windows: %USERPROFILE%\AppData\Roaming\<App Name>\logs\
-        // We can just open app.getPath('logs') if available or userData
-        const logPath = log.transports.file.getFile().path;
-        shell.showItemInFolder(logPath);
-        return true;
     });
 
     app.on('activate', () => {

@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // System
     getVersion: () => ipcRenderer.invoke('app:get-version'),
     checkUpdate: () => ipcRenderer.invoke('app:check-update'),
+    getLogPath: () => ipcRenderer.invoke('app:get-log-path'),
     openLogFolder: () => ipcRenderer.invoke('app:open-log-folder')
 });

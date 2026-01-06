@@ -29,7 +29,14 @@ function setupAutoUpdater() {
     });
 
     // Disable differential download to prevent some issues with unsigned apps
+    // Disable differential download to prevent some issues with unsigned apps
     autoUpdater.downloadedFile = false;
+
+    // Fix: Allow prerelease to ensure we find the version even if GitHub marks it strictly
+    autoUpdater.allowPrerelease = true;
+
+    // Fix: Set User-Agent to avoid 406 Not Acceptable from GitHub protections
+    autoUpdater.requestHeaders = { "User-Agent": "CloudflareDesktop/1.0.0" };
 
     // Use checkForUpdates() instead of checkForUpdatesAndNotify() to suppress system notifications
     autoUpdater.checkForUpdates();

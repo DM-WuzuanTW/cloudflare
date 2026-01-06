@@ -134,6 +134,21 @@ export default function Settings() {
                     </p>
                 </div>
             </div>
+
+            <div style={{ padding: '20px 0', borderTop: '1px solid var(--border-subtle)' }}>
+                <div style={{ marginBottom: 15, fontWeight: 500 }}>Troubleshooting</div>
+                <button
+                    className="btn btn-secondary"
+                    onClick={() => window.electronAPI.openLogFolder()}
+                >
+                    <FaFileCode style={{ marginRight: 8 }} /> Open Update Logs
+                </button>
+                <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                    If you have issues with auto-updates, check the update logs.
+                    <br />For publish/build logs, verify <code>publish_log.txt</code> in your project folder.
+                </p>
+            </div>
         </div>
-    );
+    </div >
+  );
 }

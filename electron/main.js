@@ -178,6 +178,14 @@ app.whenReady().then(() => {
         }
     });
 
+    ipcMain.handle('app:open-log-folder', () => {
+        // electron-log default path on windows: %USERPROFILE%\AppData\Roaming\<App Name>\logs\
+        // We can just open app.getPath('logs') if available or userData
+        const logPath = log.transports.file.getFile().path;
+        shell.showItemInFolder(logPath);
+        return true;
+    });
+
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });

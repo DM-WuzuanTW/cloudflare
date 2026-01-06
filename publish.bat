@@ -140,16 +140,16 @@ if defined GH_COMMAND (
         echo      [ERROR] latest.yml not found!
     )
     
-    if exist "release\Cloudflare Desktop Setup %VERSION%.exe" (
+    if exist "release\Cloudflare-Desktop-Setup-%VERSION%.exe" (
         echo      ^> Uploading installer exe...
-        call "%GH_COMMAND%" release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe" --clobber
+        call "%GH_COMMAND%" release upload v%VERSION% "release\Cloudflare-Desktop-Setup-%VERSION%.exe" --clobber
     ) else (
-        echo      [ERROR] Installer exe not found!
+        echo      [ERROR] Installer exe not found! (Checked: release\Cloudflare-Desktop-Setup-%VERSION%.exe)
     )
     
-    if exist "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" (
+    if exist "release\Cloudflare-Desktop-Setup-%VERSION%.exe.blockmap" (
         echo      ^> Uploading blockmap...
-        call "%GH_COMMAND%" release upload v%VERSION% "release\Cloudflare Desktop Setup %VERSION%.exe.blockmap" --clobber
+        call "%GH_COMMAND%" release upload v%VERSION% "release\Cloudflare-Desktop-Setup-%VERSION%.exe.blockmap" --clobber
     ) else (
         echo      [WARNING] Blockmap not found (delta updates disabled)
     )

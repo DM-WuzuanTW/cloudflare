@@ -1,6 +1,6 @@
 {
     "name": "cloudflare-desktop-panel",
-    "version": "1.0.17",
+    "version": "1.0.18",
     "description": "Premium Desktop Control Panel for Cloudflare",
     "repository": {
         "type": "git",
@@ -28,7 +28,8 @@
         ],
         "win": {
             "target": "nsis",
-            "icon": "build/icon.png"
+            "icon": "build/icon.png",
+            "artifactName": "Cloudflare-Desktop-Setup-${version}.${ext}"
         },
         "nsis": {
             "oneClick": false,

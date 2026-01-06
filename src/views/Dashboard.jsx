@@ -8,10 +8,19 @@ import Zones from './Zones';
 import Workers from './Workers';
 import Pages from './Pages';
 import Settings from './Settings';
+import DNS from './DNS';
+import Security from './Security';
+import Cache from './Cache';
 
 export default function Dashboard({ user, onLogout }) {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('zones');
+    const [targetZone, setTargetZone] = useState(null);
+
+    const handleZoneSelect = (page, zoneId) => {
+        setTargetZone(zoneId);
+        setActiveTab(page);
+    };
 
     const menuItems = [
         { id: 'dashboard', label: t('sidebar.dashboard'), icon: <FaChartPie /> },
@@ -26,22 +35,27 @@ export default function Dashboard({ user, onLogout }) {
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'zones': return <Zones />;
+            case 'zones': return <Zones onSelectZone={handleZoneSelect} />;
+            case 'dns': return <DNS initialZone={targetZone} />;
+            case 'security': return <Security initialZone={targetZone} />;
+            case 'cache': return <Cache initialZone={targetZone} />;
             case 'workers': return <Workers />;
             case 'pages': return <Pages />;
             case 'settings': return <Settings />;
             default: return (
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '60vh',
-                    color: 'var(--text-secondary)'
-                }}>
-                    <FaCog style={{ fontSize: 48, marginBottom: 20, opacity: 0.2 }} />
-                    <h2 style={{ color: 'var(--text-primary)', marginBottom: 10 }}>{t('common.coming_soon')}</h2>
-                    <p>{t('common.dev_module', { module: t(`sidebar.${activeTab}`) })}</p>
+                <div style={{ padding: 20 }}>
+                    <h2>Welcome back, {user}</h2>
+                    <p style={{ color: 'var(--text-secondary)' }}>Select a module to manage your Cloudflare resources.</p>
+                    <div className="grid-cols-3" style={{ marginTop: 30 }}>
+                        <div className="card" onClick={() => setActiveTab('zones')} style={{ cursor: 'pointer' }}>
+                            <h3>{t('sidebar.zones')}</h3>
+                            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Manage domains</p>
+                        </div>
+                        <div className="card" onClick={() => setActiveTab('workers')} style={{ cursor: 'pointer' }}>
+                            <h3>{t('sidebar.workers')}</h3>
+                            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Serverless functions</p>
+                        </div>
+                    </div>
                 </div>
             );
         }
@@ -52,7 +66,6 @@ export default function Dashboard({ user, onLogout }) {
             <div className="sidebar-area">
                 <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border-subtle)', marginBottom: 10 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fff' }}>
-                        {/* Simple Logo Placeholder */}
                         <div style={{ width: 28, height: 28, background: 'var(--cf-orange)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 16, color: '#fff' }}>
                             <FaBolt />
                         </div>
